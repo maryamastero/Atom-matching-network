@@ -1,0 +1,192 @@
+import torch
+from torch_geometric.utils import to_dense_batch
+import torch.nn as nn
+import torch.nn.functional as F  
+EPS = 1e-8
+device = 'cuda' if torch.cuda.is_available() else 'cpu'
+
+
+class FMNet(torch.nn.Module):
+    '''
+    Graph Matching Network that identifies atom similarity based on node embeddings.
+    Adapted from https://github.com/rusty1s/deep-graph-matching-consensus/blob/master/dgmc/models/dgmc.py
+    '''
+    def __init__(self, gnn, non_linear_similarity = False, mlp_hidden_dim=512):
+        super(FMNet, self).__init__()
+        self.gnn = gnn
+        # fonr non linear multipication
+        self.mlp = nn.Sequential(
+                    nn.Linear(gnn.out_channels, mlp_hidden_dim),
+                    nn.ReLU(),
+                    nn.Linear(mlp_hidden_dim, mlp_hidden_dim),
+                    nn.ReLU(),
+                    nn.Linear(mlp_hidden_dim, 1)
+                    )
+        self.non_linear_similarity = non_linear_similarity
+        
+    def reset_parameters(self):
+        self.gnn.reset_parameters()
+        self.mlp.reset_parameters()
+
+
+
+    def forward(self, x_r, edge_index_r, edge_feat_r,
+                x_p, edge_index_p,edge_feat_p, batch_size):
+        '''
+        Forward pass of the FMNet to compute similarity scores between atoms.
+        Args:
+            x_r: Atom features of the reactant graph.
+            edge_index_r: Edge indices of the reactant graph.
+            edge_feat_r: Bond features of the reactant graph.
+            x_p: Atom features of the  product graph.
+            edge_index_p: Edge indices of the product graph.
+            edge_feat_p: Bond features of the product graph.
+            batch_size: The batch size.
+
+        Returns:
+            Similarity scores between nodes.
+        '''
+        # Apply non-linear activation function to node embeddings
+        if self.non_linear_similarity:
+            h_r = F.relu(self.gnn(x_r, edge_index_r, edge_feat_r))
+            h_p = F.relu(self.gnn(x_p, edge_index_p, edge_feat_p))
+            h_r, r_mask = to_dense_batch(h_r, batch_size, fill_value=0) #binary masks (r_mask and p_mask) indicate the original lengths of the embeddings.
+            h_p, p_mask = to_dense_batch(h_p, batch_size, fill_value=0)
+            M_hat = self.mlp(h_r) @ self.mlp(h_p).transpose(-1, -2)
+        
+        else:
+            h_r = self.gnn(x_r, edge_index_r, edge_feat_r)
+            h_p = self.gnn(x_p, edge_index_p, edge_feat_p)
+            h_r, r_mask = to_dense_batch(h_r, batch_size, fill_value=0) #binary masks (r_mask and p_mask) indicate the original lengths of the embeddings.
+            h_p, p_mask = to_dense_batch(h_p, batch_size, fill_value=0)
+            M_hat = h_r @ h_p.transpose(-1, -2) # shape batch_size, N_r, N_p
+
+        M = torch.softmax(M_hat,dim=-1)[r_mask]
+
+        return M #h_r[r_mask], h_p[r_mask]
+    
+
+
+    def symmetrywise_correspondence_matrix(self, M, eq_as,rp_mapper):
+        """
+        Update the predicted correspondence matrix while considering molecule symmetry to avoid penalizing indistinguishable atoms.
+
+        Args:
+            M: The initial similarity scores matrix.
+            eq_as: A list of sets of equivalent atom for product molecule.
+            rp_mapper: mapper function beween atoms in reactant anf product molecule atoms
+
+        Returns:
+            Updated similarity scores matrix with adjustments for molecule symmetry.
+        """
+
+        M_by_equivalent=M.clone()
+
+        y_r = list(range(len(M)))
+        for group in eq_as:
+            if len(group) > 1:
+                indices = list(group)
+                for r_ind, p_ind in zip(y_r, rp_mapper):
+                    if p_ind in indices:
+                        for cnt1 in indices:
+                            for cnt2 in indices:
+                                        if cnt1 != cnt2:
+                                                M_by_equivalent[r_ind, p_ind] += M_by_equivalent[r_ind, p_ind]
+
+
+        row_sums = M_by_equivalent.sum(dim=1)
+        normalized_tensor = M_by_equivalent / row_sums.view(-1, 1)
+        M_by_equivalent = normalized_tensor.to(torch.float32).requires_grad_()
+        return(M_by_equivalent)
+        
+    
+    def loss(self, M, y_r, rp_mapper,  reduction='mean'):
+        """
+        Computes the negative log-likelihood loss for correspondence prediction.
+        Args:
+            M  : Predicted correspondence matrix (similarity scores matrix) between nodes.
+            y_r  : Ground truth  reactant atom indices.
+            rp_mapper  : Ground truth product to reactant atom matcher.
+            reduction: Specifies the reduction method for the computed loss.
+                      Options include 'none', 'mean', and 'sum'.
+
+        Returns:
+            Negative log-likelihood loss value.
+        """
+        index_r = range(len(y_r))
+        index_r = torch.tensor(index_r, device = device)
+        val = M[index_r,rp_mapper]
+        nll = -torch.log(val + EPS)
+        return nll if reduction == 'none' else getattr(torch, reduction)(nll)
+      
+           
+    def acc(self, M, y_r, rp_mapper, reduction='mean'):
+        """
+        Calculate the accuracy or the number of correctly mapped atoms in correspondence prediction.
+
+        Args:
+            M : Predicted correspondence matrix (similarity scores matrix) between nodes.
+            y_r : Ground truth  reactant node indices.
+            rp_mapper : Ground truth product to reactant atom matcher.
+            reduction: Specifies the reduction method for computed accuracy.
+                      Options include 'mean' (default), 'sum', or 'none'.
+        Returns:
+            Accuracy or the number of correctly mapped atoms.
+        """
+        index_r = range(len(y_r))
+        index_r = torch.tensor(index_r, device = device)
+        pred = M[index_r].argmax(dim=-1)
+        correct = (pred == rp_mapper).sum().item()
+        return correct / y_r.size(0) if reduction == 'mean' else correct
+    
+    def hits_at_k(self,k, M, y_r,rp_mapper, reduction='mean'):
+        """
+        Calculate hits@k metric for correspondence prediction.
+        Args:
+            k: The number of top-ranked correspondences to consider.
+            M  : Predicted correspondence matrix (similarity scores matrix) between nodes.
+            y_r  : Ground truth  reactant node indices.
+            rp_mapper : Ground truth product to reactant atom matcher.
+            reduction (str, optional): Specifies the reduction method for computed hits@k metric.
+                Options include 'mean' (default), 'sum', or 'none'.
+
+        Returns:
+            Hits@k metric indicating the percentage of correctly mapped atoms in the top-k predictions.
+        """
+        index_r = range(len(y_r))
+        index_r = torch.tensor(index_r, device = device)
+        pred = M[index_r].argsort(dim=-1, descending=True)[:, :k]
+        correct = (pred == rp_mapper.view(-1, 1)).sum().item()
+        return correct / y_r.size(0) if reduction == 'mean' else correct
+
+
+    def __repr__(self):
+        return ('{}(\n''gnn={},\n').format(self.__class__.__name__, self.gnn)
+    
+
+if __name__ =='__main__':
+    from torch_geometric.data import Data, Batch
+    from gin import GIN
+    torch.manual_seed(42)
+    x = torch.randn(4, 32)
+    edge_index = torch.tensor([[0, 1, 1, 2, 2, 3], [1, 0, 2, 1, 3, 2]])
+    data = Data(x=x, edge_index=edge_index)
+    x, e, b = data.x, data.edge_index, data.batch
+    gnn = GIN(data.num_node_features, 16, num_layers=2)
+    model = FMNet(gnn)
+    M_test = model(x, e, None, x, e, None, b)
+    print(M_test)
+    print( M_test.size() == (data.num_nodes, data.num_nodes))
+
+    y_r = torch.tensor([0,1, 2, 3])
+    y_p = torch.tensor([0,1, 2, 3])
+    M = torch.tensor([[0.5,0,0.5,0], [0,1,0,0],[0.5,0,0.5,0],[0,0,0,1]])
+    rp_mapper = torch.tensor([0,1, 2, 3])
+    eq_as = [{0,2}, {1},{3}]
+    ll2 = model.loss(M, y_r, rp_mapper)
+    print(ll2)
+
+
+
+
+
