@@ -5,7 +5,9 @@ This repository contains the data and codes of the paper: Learning symmetry-awar
 
 
  # Dataset
- 
+ The dataset was sourced from https://github.com/wengong-jin/nips17-rexgen/tree/master.
+
+
  # Model
 ```
 code test
