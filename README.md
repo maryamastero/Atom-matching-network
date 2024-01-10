@@ -6,7 +6,8 @@ This repository contains the data and codes of the paper: Learning symmetry-awar
 
  # Dataset
  The dataset was sourced from https://github.com/wengong-jin/nips17-rexgen/tree/master.
-
+Atom features
+![Screenshot 2024-01-10 at 16 16 34](https://github.com/maryamastero/Atom-matching-network/assets/60658276/c4bbb388-545b-45d8-9559-1c054374c28d)
 
  # Model
 ```
