@@ -1,0 +1,16 @@
+name: mol-graph
+channels:
+  - nvidia
+  - pytorch
+  - conda-forge
+  - pyg
+  - rdkit
+dependencies:
+  - pytorch=*=*cuda*
+  - pytorch-cuda=11.7
+  - rdkit
+  - pyg
+  - pandas
+  - scikit-learn
+  - networkx
+  - python=3.10
