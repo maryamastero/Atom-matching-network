@@ -3,6 +3,8 @@ This repository contains the data and codes of the paper: Learning symmetry-awar
 
 ![amnet](https://github.com/maryamastero/Atom-matching-network/assets/60658276/595e55c1-014f-428a-a177-e31fd760ba3c)
 
+The initial step involves transforming molecular structures into graphs, incorporating atom and bond features that encapsulate their distinctive attributes. The molecular graph is then processed by graph isomorphism networks (GIN). This process allows each node within the input molecular graph to be transformed into an embedding space. These node embeddings capture both the topological structure of the nodes and their features. To achieve this embedding, a shared weight neural network takes as input the adjacency matrices of both molecular graphs, as well as their node feature and edge features. This process brings both molecular graphs into the same space; therefore, pairwise matching scores can be computed between the nodes of ${G}_R$ and ${G}_P$ using a similarity function (e.g., dot product), which takes as input the features of two vectors, and its output is a scalar similarity score. These pairwise matching scores are stored in the initial correspondence matrix.
+
 
  # Dataset
  The dataset was sourced from https://github.com/wengong-jin/nips17-rexgen/tree/master.
@@ -10,6 +12,8 @@ Atom features
 ![Screenshot 2024-01-10 at 16 16 34](https://github.com/maryamastero/Atom-matching-network/assets/60658276/c4bbb388-545b-45d8-9559-1c054374c28d)
 
  # Model
+
+ 
 ```
 code test
 ```
