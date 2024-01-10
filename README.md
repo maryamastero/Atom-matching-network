@@ -13,7 +13,7 @@ This repository contains the data and codes of the paper: Learning symmetry-awar
 code test
 ```
 # Identifying chemically equivalent atoms with Weisfeiler-Lehman test
-
+Chemically equivalent atoms are atoms within a molecule that have the same chemical environment and exhibit identical properties in a given chemical context. We utilize an adaptation of the Weisfeiler-Lehman (WL) test for identifying chemically equivalent atoms within a molecule. We consider two atoms to be chemically equivalent if they have the same atomic symbol and their three hop neighbors are the same.
 ![eqa](https://github.com/maryamastero/Atom-matching-network/assets/60658276/f277516c-549c-42fd-9670-5d20635f122c)
 
  # Results
