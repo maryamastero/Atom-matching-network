@@ -5,6 +5,10 @@ This repository contains the data and codes of the paper: Learning symmetry-awar
 
 The initial step involves transforming molecular structures into graphs, incorporating atom and bond features that encapsulate their distinctive attributes. The molecular graph is then processed by graph isomorphism networks (GIN). This process allows each node within the input molecular graph to be transformed into an embedding space. These node embeddings capture both the topological structure of the nodes and their features. To achieve this embedding, a shared weight neural network takes as input the adjacency matrices of both molecular graphs, as well as their node feature and edge features. This process brings both molecular graphs into the same space; therefore, pairwise matching scores can be computed between the nodes of ${G}_R$ and ${G}_P$ using a similarity function (e.g., dot product), which takes as input the features of two vectors, and its output is a scalar similarity score. These pairwise matching scores are stored in the initial correspondence matrix.
 
+Then, to obtain the pairwise matching probabilities, we normalize the matrix $\hat{M}$ row-wise. The matrix can be interpreted as a correspondence matrix that assigns a probability to each pair of nodes in ${G}_R$ and ${G}_P$, indicating the likelihood of each node in ${G}_R$ being matched with each node in ${G}_P$.
+
+After that, to not penalize the model for failing to distinguish between chemically equivalent atoms, we take advantage of molecular symmetry information. This approach recognizes the inherent symmetry and allows the model to focus on distinguishing between non-equivalent atoms, resulting in a more efficient and accurate atom mapping process.
+
 
  # Dataset
  The dataset was sourced from https://github.com/wengong-jin/nips17-rexgen/tree/master.
