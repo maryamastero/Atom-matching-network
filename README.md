@@ -13,3 +13,8 @@ This repository contains the data and codes of the paper: Learning symmetry-awar
 code test
 ```
  # Results
+ Performance of the AMNet with and without molecule symmetry identification
+![Screenshot 2024-01-10 at 16 07 15](https://github.com/maryamastero/Atom-matching-network/assets/60658276/d30d857a-658a-4bb8-9a55-42e3abbcb699)
+
+Performance of the AMNet using various choices of features on USPTO-15k test set
+![Screenshot 2024-01-10 at 16 07 46](https://github.com/maryamastero/Atom-matching-network/assets/60658276/e5a2d634-3bb0-4ca4-b9d3-1c7f23ef4037)
