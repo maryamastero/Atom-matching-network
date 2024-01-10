@@ -9,6 +9,14 @@ Then, to obtain the pairwise matching probabilities, we normalize the matrix $\h
 
 After that, to not penalize the model for failing to distinguish between chemically equivalent atoms, we take advantage of molecular symmetry information. This approach recognizes the inherent symmetry and allows the model to focus on distinguishing between non-equivalent atoms, resulting in a more efficient and accurate atom mapping process.
 
+To evaluate the effectiveness of models, we report the percentages of correctly mapped reactions at the top@1, top@3, and top@5 and the average accuracy of the prediction on the test dataset. Top@k indicates the number of reactions correctly mapped when the mapped atom is correct in the first top prediction. The average Accuracy of atom mapping is calculated by summing up the accuracy of the predicted atom mapping of each reaction and then dividing it by the total number of reactions in the test set. The performance of our method is evaluated across a number of tasks, each contributing to a comprehensive assessment.
+
+In our initial task, our primary objective was to evaluate the effect of identifying molecular symmetry on atom mapping predictions. This experiment involves comparing models that incorporate the identification of molecular symmetry with those that do not. 
+
+Our second task explores understanding the influence of feature selection on the performance of the AMNet. This step is pivotal in understanding how the choice of features impacts the accuracy and overall quality of our atom mapping predictions. 
+
+In our final task, we evaluate our model's performance using a subset of the widely recognized Golden dataset. This dataset is commonly used in the evaluation of various atom mapping methods. Our assessment against this benchmark dataset provides valuable insights into how our model's capabilities compare to other established techniques.
+
 
  # Dataset
  The dataset was sourced from https://github.com/wengong-jin/nips17-rexgen/tree/master.
