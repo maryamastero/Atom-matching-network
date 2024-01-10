@@ -1,7 +1,10 @@
-# Atom_matching_network
-Learning atom mappings in chemical reactions through deep graph matching
+# Atom matching network
+Learning symmetry-aware atom mapping in chemical reactions through deep graph matching
+
+![amnet](https://github.com/maryamastero/Atom-matching-network/assets/60658276/595e55c1-014f-428a-a177-e31fd760ba3c)
+
 
 ```
 code test
 ```
-[sample_prediction.pdf](https://github.com/maryamastero/Atom-matching-network/files/13888373/sample_prediction.pdf)
+
