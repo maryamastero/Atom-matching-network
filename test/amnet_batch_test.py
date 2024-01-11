@@ -35,9 +35,8 @@ parser.add_argument('--batch_size', type = int, default = 1)
 args = parser.parse_args()
 
 
-test_data = pd.read_csv('MoleculeDataset/vcna_train.csv')
-#test_data = pd.read_csv('golden_dataset/processed_golden2.csv', header=None)
-test_dataset = MolGraphDataset(test_data.iloc[:306], args.num_wl_iterations, santitize=args.santitize)
+test_data = pd.read_csv('MoleculeDataset/test.csv')
+test_dataset = MolGraphDataset(test_data, args.num_wl_iterations, santitize=args.santitize)
 test_loader = DataLoader(test_dataset, args.batch_size, shuffle=True,follow_batch=['x_r', 'x_p'])
 
 gnn_1 = GIN(args.node_features_dim, args.embedding_dim, num_layers=args.num_layers, cat=False )
@@ -50,7 +49,7 @@ print(args)
 
 
 
-model.load_state_dict(torch.load('experiment2/28_09_t5/model.pth',map_location=torch.device('cpu')))
+model.load_state_dict(torch.load('experiment1/12_125/model.pth',map_location=torch.device('cpu')))
 model.eval()
 
 correct = num_examples = 0
@@ -87,7 +86,6 @@ with torch.no_grad():
         all_h10.append(h10)
 
 
-path = 'experiment2/28_09_t5/t10'
 
 if not os.path.exists(path):
     os.makedirs(path)
