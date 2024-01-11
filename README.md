@@ -42,14 +42,19 @@ Chemically equivalent atoms are atoms within a molecule that have the same chemi
 Performance of the AMNet using various choices of features on USPTO-15k test set
 ![Screenshot 2024-01-10 at 16 07 46](https://github.com/maryamastero/Atom-matching-network/assets/60658276/e5a2d634-3bb0-4ca4-b9d3-1c7f23ef4037)
 
+# Environment
+- `mol_graph.yml`: Configuration file for the required environment.
 
-# Codes
 
-- /dataset/preprocessing.py : preprocess data to remove duplicate and invalid molecules
-- /dataset/molgraphdataset.py : creates pythorch geometric dataset from data
-- AMNet/amnet.py :atom mapping model GIN
-- /utils/wl.py : Weisfeiler-Lehman test for identification of equivalent atoms
-- /train/amnet_train.py : train on USPTO-15k
+# Code Structure
+
+- `/dataset/preprocessing.py`: Preprocesses the data, removing duplicate and invalid molecules.
+- `/dataset/molgraphdataset.py`: Creates a PyTorch Geometric dataset from the preprocessed data.
+- `/AMNet/amnet.py`: Implementation of the Atom Mapping Network using Graph Isomorphism Network(GIN).
+- `/utils/wl.py`: Weisfeiler-Lehman test for identification of equivalent atoms.
+- `/train/amnet_train.py`: Training script for the AMNet model on the USPTO-15k dataset.
+
+
 
 # Test
 ```
