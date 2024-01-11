@@ -23,7 +23,7 @@ In our final task, we evaluate our model's performance using a subset of the wid
 
 In order to evaluate how the choice of features influences the accuracy of atom mapping predictions, we conducted an analysis involving various choices of node and edge features.
 Atom features
-![Screenshot 2024-01-10 at 16 16 34](https://github.com/maryamastero/Atom-matching-network/assets/60658276/c4bbb388-545b-45d8-9559-1c054374c28d)
+![Screenshot 2024-01-11 at 9 08 17](https://github.com/maryamastero/Atom-matching-network/assets/60658276/1c9db5df-0f23-445e-ab98-12b6b12de741)
 
  # Model
 
