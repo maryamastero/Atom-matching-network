@@ -18,7 +18,6 @@ import random
 - edge_features: A tensor containing edge features.
 - edge_index: A tensor representing the edge indices.
 """
-
 GraphData = collections.namedtuple('GraphData', [
     'n_nodes',
     'node_features',
