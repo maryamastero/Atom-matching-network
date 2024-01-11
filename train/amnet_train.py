@@ -66,8 +66,8 @@ def train(train_loader):
     for i, data in enumerate(train_loader):   
         optimizer.zero_grad()
         data = data.to(device)
-        M0_hat, Mt_hat  = model( data.x_r,data.edge_index_r,None,  #data.edge_feat_r
-                                data.x_p, data.edge_index_p, None,# data.edge_feat_p
+        M0_hat, Mt_hat  = model( data.x_r,data.edge_index_r,data.edge_feat_r,
+                                data.x_p, data.edge_index_p,data.edge_feat_p,
                                 data.batch_size)
 
         M_0 = model.adjust_correspondence_matrix_for_symmetry(M0_hat, data.eq_as[0])
@@ -93,8 +93,8 @@ def validation_loss(loader):
     with torch.no_grad():
         for data in loader:
             data = data.to(device)
-            M0_hat, Mt_hat  = model( data.x_r,data.edge_index_r,None,  #data.edge_feat_r
-                        data.x_p, data.edge_index_p, None, data.batch_size)# data.edge_feat_p
+            M0_hat, Mt_hat  = model( data.x_r,data.edge_index_r,data.edge_feat_r,
+                        data.x_p, data.edge_index_p,data.edge_feat_p, data.batch_size)
         
             M_0 = model.adjust_correspondence_matrix_for_symmetry(M0_hat, data.eq_as[0])
             M_T = model.adjust_correspondence_matrix_for_symmetry(Mt_hat, data.eq_as[0])
@@ -139,7 +139,7 @@ for epoch in range(1, args.n_epochs+1):
         print(f'Early stopping. No improvement in {epoch} epochs.')
         break
     
-path = 'experiment2/25_09_t5'
+path = 'experiment1/12_12'
 
 if not os.path.exists(path):
     os.makedirs(path)
