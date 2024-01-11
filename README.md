@@ -48,8 +48,8 @@ Performance of the AMNet using various choices of features on USPTO-15k test set
 - /dataset/preprocessing.py : preprocess data to remove duplicate and invalid molecules
 - /dataset/molgraphdataset.py : creates pythorch geometric dataset from data
 - AMNet/amnet.py :atom mapping model GIN
-- utils/wl.py : Weisfeiler-Lehman test for identification of equivalent atoms
-- train/amnet_train.py : train on USPTO-15k
+- /utils/wl.py : Weisfeiler-Lehman test for identification of equivalent atoms
+- /train/amnet_train.py : train on USPTO-15k
 
 # Test
 ```
