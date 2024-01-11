@@ -38,10 +38,11 @@ Chemically equivalent atoms are atoms within a molecule that have the same chemi
  # Results
  Performance of the AMNet with and without molecule symmetry identification
  
-![Screenshot 2024-01-11 at 9 50 13](https://github.com/maryamastero/Atom-matching-network/assets/60658276/6479cffc-c732-4664-9151-bfe9fd31f71a)
+ ![Screenshot 2024-01-11 at 9 49 50](https://github.com/maryamastero/Atom-matching-network/assets/60658276/f89586d1-79c1-448f-af96-0cc9d0191a00)
+
 
 Performance of the AMNet using various choices of features on the USPTO-15k test set
-![Screenshot 2024-01-11 at 9 50 04](https://github.com/maryamastero/Atom-matching-network/assets/60658276/426dc426-1606-4ab2-9515-1d462d725672)
+![Screenshot 2024-01-11 at 9 48 34](https://github.com/maryamastero/Atom-matching-network/assets/60658276/be7d600f-b32e-4b5e-8d2a-b9468dd76803)
 
 # Environment
 - `mol_graph.yml`: Configuration file for the required environment.
