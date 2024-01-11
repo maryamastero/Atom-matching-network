@@ -5,8 +5,7 @@ from gin import GIN
 import pandas as pd
 from fmnet import FMNet
 import rdkit.Chem as Chem
-#from molgraphdataset import *
-from golden_dataset import *
+from molgraphdataset import *
 import pickle
 import os
 import pickle
