@@ -171,29 +171,6 @@ def molecule_to_graph(mol):
         graph.add_edge(start_atom, end_atom, bond_type=bond_type)
     
     return graph
-#  Get the dict maps each atom index to the mapping number.
-def get_atomidx2mapidx(mol):
-    atomidx2mapidx = {}
-    for atom in mol.GetAtoms():
-        atomidx2mapidx[atom.GetIdx()] = atom.GetAtomMapNum()
-    return atomidx2mapidx
 
 
-#  Get the dict maps each mapping number to the atom index .
-def get_mapidx2atomidx(mol):
-    mapidx2atomidx = {}
-    mapidx2atomidx[0] = []
-    for atom in mol.GetAtoms():
-        if atom.GetAtomMapNum() == 0:
-            mapidx2atomidx[0].append(atom.GetIdx())
-        else:
-            mapidx2atomidx[atom.GetAtomMapNum()] = atom.GetIdx()
-    return mapidx2atomidx
 
-
-# Get the reactant atom index list in the order of product atom index.
-def get_order_reacidx2prodidx(product_mol, patomidx2pmapidx, rmapidx2ratomidx):
-    order = []
-    for atom in product_mol.GetAtoms():
-        order.append(rmapidx2ratomidx[patomidx2pmapidx[atom.GetIdx()]])
-    return order
