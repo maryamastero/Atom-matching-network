@@ -57,5 +57,5 @@ Performance of the AMNet using various choices of features on USPTO-15k test set
 
 
 # Example
-![Screenshot 2024-01-11 at 9 45 42](https://github.com/maryamastero/Atom-matching-network/assets/60658276/005d508d-8227-4112-bc8b-770aeb05e18d)
 
+![Screenshot 2024-01-11 at 9 46 45](https://github.com/maryamastero/Atom-matching-network/assets/60658276/e75dc85d-61a3-4035-b3c8-207d1f4c4886)
