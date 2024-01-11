@@ -8,17 +8,13 @@ import torch.nn as nn
 EPS = 1e-8
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
 
-
 def to_sparse(x, mask):
     return x[mask]
-
 
 def to_dense(x, mask):
     out = x.new_zeros(tuple(mask.size()) + (x.size(-1), ))
     out[mask] = x
     return out
-
-
 
 class AMNet(torch.nn.Module):
     """
@@ -67,14 +63,11 @@ class AMNet(torch.nn.Module):
             nn.Linear(mlp_hidden_dim, 1)
         )
         
-
     def reset_parameters(self):
         self.gnn_1.reset_parameters()
         self.gnn_2.reset_parameters()
         self.nonlinearsimilarity.reset_parameters()
-
         reset(self.mlp)
-
 
     def forward(self, x_r, edge_index_r, edge_feat_r,
                 x_p, edge_index_p,edge_feat_p, batch_size):
@@ -116,7 +109,6 @@ class AMNet(torch.nn.Module):
         return M_0 , M_T
     
 
-
     def symmetrywise_correspondence_matrix(self, M, eq_as,rp_mapper):
         """
         Update the predicted correspondence matrix while considering molecule symmetry to avoid penalizing indistinguishable atoms.
@@ -131,7 +123,6 @@ class AMNet(torch.nn.Module):
         """
 
         M_by_equivalent=M.clone()
-
         y_r = list(range(len(M)))
         for group in eq_as:
             if len(group) > 1:
@@ -147,8 +138,7 @@ class AMNet(torch.nn.Module):
         row_sums = M_by_equivalent.sum(dim=1)
         normalized_tensor = M_by_equivalent / row_sums.view(-1, 1)
         M_by_equivalent = normalized_tensor.to(torch.float32).requires_grad_()
-        return(M_by_equivalent)
-        
+        return(M_by_equivalent) 
 
     def loss(self, M, y_r, rp_mapper,  reduction='mean'):
         """
@@ -215,7 +205,6 @@ class AMNet(torch.nn.Module):
                 '    num_concensus_iter={}\n)').format(self.__class__.__name__,
                                                     self.gnn_1, self.gnn_2,
                                                     self.num_concensus_iter)
-    
 
 if __name__ =='__main__':
     from torch_geometric.data import Data, Batch
@@ -238,8 +227,8 @@ if __name__ =='__main__':
     M = torch.tensor([[0.5,0,0.5,0], [0,1,0,0],[0.5,0,0.5,0],[0,0,0,1]])
     rp_mapper = torch.tensor([0,1, 2, 3])
     eq_as = [{0,2}, {1},{3}]
-    ll2 = model.loss(M, y_r,rp_mapper)
-    print(ll2)
+    l = model.loss(M, y_r,rp_mapper)
+    print(l)
 
 
 
