@@ -31,7 +31,6 @@ test_data = pd.read_csv('MoleculeDataset/test.csv')
 test_dataset = MolGraphDataset(test_data, args.num_wl_iterations, santitize=args.santitize)
 test_loader = DataLoader(test_dataset, args.batch_size, shuffle=False,follow_batch=['x_r', 'x_p'])
 
-
 gnn = GIN(args.node_features_dim, args.embedding_dim, num_layers=args.num_layers, cat=True )
 model = FMNet(gnn)
 
