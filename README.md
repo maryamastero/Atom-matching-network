@@ -1,5 +1,7 @@
 ## Learning symmetry-aware atom mapping in chemical reactions through deep graph matching
 This repository contains the data and codes of the paper: Learning symmetry-aware atom mapping in chemical reactions through deep graph matching
+[
+](https://eur01.safelinks.protection.outlook.com/?url=https%3A%2F%2Flinks.springernature.com%2Ff%2Fa%2FzEtQf-Ib0W20qDFh0Oy4TQ~~%2FAABE5gA~%2FRgRoCR02P0SiaHR0cHM6Ly9saW5rLnNwcmluZ2VyLmNvbS8xMC4xMTg2L3MxMzMyMS0wMjQtMDA4NDEtMD91dG1fc291cmNlPXJjdF9jb25ncmF0ZW1haWx0JnV0bV9tZWRpdW09ZW1haWwmdXRtX2NhbXBhaWduPW9hXzIwMjQwNDIyJnV0bV9jb250ZW50PTEwLjExODYvczEzMzIxLTAyNC0wMDg0MS0wVwNzcGNCCmYhNpgmZivyaRRSFm1hcnlhbS5hc3Rlcm9AYWFsdG8uZmlYBAAABy0~&data=05%7C02%7Cmaryam.astero%40aalto.fi%7Ca64edc29746b40d4b8f108dc62ee0df7%7Cae1a772440414462a6dc538cb199707e%7C1%7C0%7C638494021795256479%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoiV2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C0%7C%7C%7C&sdata=G1POGRx%2BeGEl98%2FYTfKiqQMf0qVOjwg%2F5BifogBdNAo%3D&reserved=0)
 
 ![amnet](https://github.com/maryamastero/Atom-matching-network/assets/60658276/595e55c1-014f-428a-a177-e31fd760ba3c)
 
