@@ -78,36 +78,44 @@ class FMNet(torch.nn.Module):
     
    
 
-    def symmetrywise_correspondence_matrix(self, M, eq_as,rp_mapper):
+    def symmetrywise_correspondence_matrix(self, M):
         """
         Update the predicted correspondence matrix while considering molecule symmetry to avoid penalizing indistinguishable atoms.
 
         Args:
             M: The initial similarity scores matrix.
             eq_as: A list of sets of equivalent atoms for product molecule.
-            rp_mapper: mapper function between atoms in reactant and product molecule atoms
 
         Returns:
             Updated similarity scores matrix with adjustments for molecule symmetry.
+
+        Example:
+        eq_as = [{0, 2}, {1}, {3}]
+        initial_similarity_matrix = torch.tensor([[0.5, 0, 0.5, 0], [0, 1, 0, 0], [0.5, 0, 0.5, 0], [0, 0, 0, 1]])
+        updated_similarity_matrix = adjust_correspondence_matrix_for_symmetry(initial_similarity_matrix, eq_as)
+        print(updated_similarity_matrix)
+        # Output:
+        # tensor([[0.75, 0.  , 0.75, 0.  ],
+        #         [0.  , 1.  , 0.  , 0.  ],
+        #         [0.75, 0.  , 0.75, 0.  ],
+        #         [0.  , 0.  , 0.  , 1.  ]], requires_grad=True)
         """
 
+        mask = self.get_equivalent_atom_mask(eq_as)
+        mask= mask.to(device)
         M_by_equivalent=M.clone()
 
-        y_r = list(range(len(M)))
-        for group in eq_as:
-            if len(group) > 1:
-                indices = list(group)
-                for r_ind, p_ind in zip(y_r, rp_mapper):
-                    if p_ind in indices:
-                        for cnt1 in indices:
-                            for cnt2 in indices:
-                                        if cnt1 != cnt2:
-                                                M_by_equivalent[r_ind, p_ind] += M_by_equivalent[r_ind, p_ind]
+        
+        for eq in eq_as:
+            if len(eq)>1: # in there are some equivalent atoms in the molecul#
+                    eq = list(eq)
+                    for cnt1 in range(len(eq)):
+                        for cnt2 in range(len(eq)):
+                                    if cnt1 != cnt2:
+                                            M_by_equivalent[eq[cnt1],eq[cnt1]] += M_by_equivalent[eq[cnt1],eq[cnt2]]
+                                            M_by_equivalent[eq[cnt1],eq[cnt2]] = 0
 
-
-        row_sums = M_by_equivalent.sum(dim=1)
-        normalized_tensor = M_by_equivalent / row_sums.view(-1, 1)
-        M_by_equivalent = normalized_tensor.to(torch.float32).requires_grad_()
+        M_by_equivalent = M_by_equivalent.to(torch.float32).requires_grad_()
         return(M_by_equivalent)
         
         
