@@ -76,9 +76,39 @@ class FMNet(torch.nn.Module):
 
         return M
     
-   
+    def get_equivalent_atom_mask(self, eq_as):
+        """
+        Generate an equivalent atom mask to account for molecule symmetry based on the WL-test results.
 
-    def symmetrywise_correspondence_matrix(self, M):
+        Args:
+            eq_as (list of sets): A list of sets representing equivalent atoms.
+
+        Returns:
+            torch.Tensor: A binary mask tensor where equivalent atoms are set to one and others to zero.
+
+        Example:
+        eq_as = [{0, 2}, {1}, {3}]
+        equivalent_mask = get_equivalent_atom_mask(eq_as)
+        print(equivalent_mask)
+        # Output: 
+        # tensor([[1., 0., 1., 0.],
+        #         [0., 1., 0., 0.],
+        #         [1., 0., 1., 0.],
+        #         [0., 0., 0., 1.]])
+
+        """
+        n = sum(len(cols) for cols in eq_as)
+        mask = torch.zeros((n , n ))
+        for columns in eq_as:  
+                if len(columns)>1:
+                        for col1 in columns:
+                                for col2 in columns:
+                                        mask[col1,col2] = 1
+                if len(columns) == 1:
+                                mask[list(columns), list(columns)] = 1
+        return mask
+
+    def symmetrywise_correspondence_matrix(self, M, eq_as):
         """
         Update the predicted correspondence matrix while considering molecule symmetry to avoid penalizing indistinguishable atoms.
 
