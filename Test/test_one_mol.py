@@ -98,6 +98,20 @@ for element in data.y_p:
 
 print('r_index, atom mapping', data.y_r )
 print('p_index, atom mapping', data.rp_mapper)
+
+replaced_atoms = set() 
+
+atom_to_set = {atom: atom_set for atom_set in data.eq_as for atom in atom_set}
+occurrences = {}
+for i, atom in enumerate(pred):
+    if atom in atom_to_set:
+        occurrences[atom] = occurrences.get(atom, 0) + 1
+        if occurrences[atom] == 2:
+            atom_set = atom_to_set[atom]
+            if len(atom_set) > 1:
+                other_atom = next(iter(atom_set - {atom}))
+                pred[i] = other_atom
+
 print('pred, atom mapping', pred)
 
 draw_whole_reaction(test_data,i)
