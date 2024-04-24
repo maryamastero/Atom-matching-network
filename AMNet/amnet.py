@@ -122,7 +122,7 @@ class FMNet(torch.nn.Module):
         Example:
         eq_as = [{0, 2}, {1}, {3}]
         initial_similarity_matrix = torch.tensor([[0.5, 0, 0.5, 0], [0, 1, 0, 0], [0.5, 0, 0.5, 0], [0, 0, 0, 1]])
-        updated_similarity_matrix = adjust_correspondence_matrix_for_symmetry(initial_similarity_matrix, eq_as)
+        updated_similarity_matrix = symmetrywise_correspondence_matrix(initial_similarity_matrix, eq_as)
         print(updated_similarity_matrix)
         # Output:
         # tensor([[0.75, 0.  , 0.75, 0.  ],
