@@ -70,7 +70,7 @@ def train(train_loader):
                             data.batch_size) 
        
         
-        M = model.symmetrywise_correspondence_matrix(M_hat,data.eq_as[0],data.rp_mapper)
+        M = model.symmetrywise_correspondence_matrix(M_hat,data.eq_as)
         loss = model.loss(M, data.y_r,  data.rp_mapper)
 
         loss.backward()
@@ -95,7 +95,7 @@ def validation_loss(loader):
                                 data.batch_size) 
         
         
-            M = model.symmetrywise_correspondence_matrix(M_hat, data.eq_as[0], data.rp_mapper)
+            M = model.symmetrywise_correspondence_matrix(M_hat, data.eq_as)
             loss = model.loss(M, data.y_r, data.rp_mapper)
             total_loss += loss.item()
 
@@ -133,7 +133,7 @@ for epoch in range(1, args.n_epochs+1):
         print(f'Early stopping. No improvement in {epoch} epochs.')
         break
     
-path = 'experiment1/05_10_edege_feature_golden_0'
+path = 'experiment1/05_10_edege_feature'
 
 if not os.path.exists(path):
     os.makedirs(path)
