@@ -57,11 +57,11 @@ preds = []
 total_loss = total_nodes = total_correct = 0
 with torch.no_grad():
     for i, data in enumerate(test_loader):
-        M0_hat  = model( data.x_r,data.edge_index_r,data.edge_feat_r ,
+        M_0  = model( data.x_r,data.edge_index_r,data.edge_feat_r ,
                                 data.x_p, data.edge_index_p,data.edge_feat_p,
                                  data.batch_size) 
                 
-        M_0 = model.symmetrywise_correspondence_matrix(M0_hat, data.eq_as[0],data.rp_mapper)
+        M_hat = model.symmetrywise_correspondence_matrix(M_0, data.eq_as[0],data.rp_mapper)
         index_r = range(len(data.y_r))
         index_r = torch.tensor(index_r)
         pred = M_0[index_r].argmax(dim=-1)
