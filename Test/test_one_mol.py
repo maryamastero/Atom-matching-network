@@ -63,7 +63,7 @@ M0_hat  = model( data.x_r,data.edge_index_r,None, #data.edge_feat_r ,
                         data.x_p, data.edge_index_p,None, #data.edge_feat_p,
                                 data.batch_size) 
 print(M0_hat)
-M_0 = model.adjust_correspondence_matrix_for_symmetry(M0_hat, data.eq_as)
+M_0 = model.symmetrywise_correspondence_matrix(M0_hat, data.eq_as)
         
 correct = model.acc(M_0, data.y_r, data.y_p, data.rp_mapper, reduction='sum')
 total_nodes = data.y_r.size(0)
