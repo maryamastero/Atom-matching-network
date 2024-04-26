@@ -46,73 +46,38 @@ print(args)
 
 gnn =  gnn.to(device)
 model = model.to(device)
-path = 'experiment1/10_01'
+
+path = 'experiment1/updated_acc'
 
 model.load_state_dict(torch.load(f'{path}/model.pth',map_location=torch.device('cpu')))
 
 
 data = next(iter(test_loader))
 
-
+print(data.eq_as[0])
 print(20*'*')
 
 model.eval()
 
     
-M0_hat  = model( data.x_r,data.edge_index_r,None, #data.edge_feat_r ,
-                        data.x_p, data.edge_index_p,None, #data.edge_feat_p,
+M  = model( data.x_r,data.edge_index_r,data.edge_feat_r ,
+                        data.x_p, data.edge_index_p,data.edge_feat_p,
                                 data.batch_size) 
-print(M0_hat)
-M_0 = model.symmetrywise_correspondence_matrix(M0_hat, data.eq_as)
-        
-correct = model.acc(M_0, data.y_r, data.y_p, data.rp_mapper, reduction='sum')
-total_nodes = data.y_r.size(0)
-print(correct / total_nodes) 
-h1 = model.hits_at_k( 1, M_0, data.y_r, data.y_p,  data.rp_mapper,reduction='mean')
-print(h1)
-h3 = model.hits_at_k( 3, M_0, data.y_r, data.y_p,  data.rp_mapper,reduction='mean')
-print(h3)
-h5 = model.hits_at_k( 5, M_0, data.y_r, data.y_p,  data.rp_mapper,reduction='mean')
-print(h5)
-h10 = model.hits_at_k( 10, M_0, data.y_r, data.y_p,  data.rp_mapper,reduction='mean')
-print(h10)
-plot_M(M0_hat,i, 'M0_hat')
 
-plot_M(M_0,i, '')
-index_r = range(len(data.y_r))
-index_r = torch.tensor(index_r, device = device)
-pred = M_0[index_r].argmax(dim=-1)
-pred= pred.tolist()
-sorted_pred = []
-for element in data.y_p:
-    # Initialize a flag to check if element is in pred
-    found = False
-    for item in pred:
-        if int(item) == int(element):
-            sorted_pred.append(int(item))
-            found = True
-            break
-    if not found:
-        sorted_pred.append('Na')
+pred= get_predicted_atom_mapping(M, data)
+acc = get_acc_on_test(pred,data)
+print('acc:', acc) 
+h1 = model.hits_at_k( 1, M, data.y_r, data.rp_mapper,reduction='mean')
+print('h1:',h1)
+h3 = model.hits_at_k( 3, M, data.y_r, data.rp_mapper,reduction='mean')
+print('h3:',h3)
+h5 = model.hits_at_k( 5, M, data.y_r,  data.rp_mapper,reduction='mean')
+print('h5:',h5)
+h10 = model.hits_at_k( 10, M, data.y_r, data.rp_mapper,reduction='mean')
+print('h10:',h10)
+plot_M(M,i, 'M')
 
-
-print('r_index, atom mapping', data.y_r )
-print('p_index, atom mapping', data.rp_mapper)
-
-replaced_atoms = set() 
-
-atom_to_set = {atom: atom_set for atom_set in data.eq_as for atom in atom_set}
-occurrences = {}
-for i, atom in enumerate(pred):
-    if atom in atom_to_set:
-        occurrences[atom] = occurrences.get(atom, 0) + 1
-        if occurrences[atom] == 2:
-            atom_set = atom_to_set[atom]
-            if len(atom_set) > 1:
-                other_atom = next(iter(atom_set - {atom}))
-                pred[i] = other_atom
+print('gt, atom mapping', data.rp_mapper)
 
 print('pred, atom mapping', pred)
 
-draw_whole_reaction(test_data,i)
-print(data.eq_as)
