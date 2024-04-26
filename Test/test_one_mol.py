@@ -10,6 +10,8 @@ import pickle
 import os
 import pickle
 from plots import *
+from  utils import get_predicted_atom_mapping, get_acc_on_test
+
 print(20*'-')
 
 device = 'cuda' if torch.cuda.is_available() else 'cpu'
