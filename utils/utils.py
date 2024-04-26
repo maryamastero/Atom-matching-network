@@ -173,4 +173,35 @@ def molecule_to_graph(mol):
     return graph
 
 
+def get_predicted_atom_mapping(M_0, data):
+    index_r = range(len(data.y_r))
+    index_r = torch.tensor(index_r, device = device)
+    pred = M_0[index_r].argmax(dim=-1)
+    pred= pred.tolist()
+
+    replaced_atoms = set() 
+    atom_to_set = {atom: atom_set for atom_set in data.eq_as[0] for atom in atom_set}
+    occurrences = {}
+    for i, atom in enumerate(pred):
+        if atom in atom_to_set:
+            occurrences[atom] = occurrences.get(atom, 0) + 1
+            if occurrences[atom] == 2:
+                atom_set = atom_to_set[atom]
+                if len(atom_set) > 1:
+                    other_atom = next(iter(atom_set - {atom}))
+                    pred[i] = other_atom
+    return pred
+
+
+def get_acc_on_test(pred,data):
+    np_rp = [rp.item() for rp in data.rp_mapper]
+    correct = 0
+
+    for i in range(len(pred)):
+        if pred[i] == np_rp[i]:
+            correct += 1
+    total_nodes = data.y_r.size(0)
+    return(correct / total_nodes) 
+
+
 
