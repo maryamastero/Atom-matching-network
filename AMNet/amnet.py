@@ -76,76 +76,37 @@ class FMNet(torch.nn.Module):
 
         return M
     
-    def get_equivalent_atom_mask(self, eq_as):
-        """
-        Generate an equivalent atom mask to account for molecule symmetry based on the WL-test results.
-
-        Args:
-            eq_as (list of sets): A list of sets representing equivalent atoms.
-
-        Returns:
-            torch.Tensor: A binary mask tensor where equivalent atoms are set to one and others to zero.
-
-        Example:
-        eq_as = [{0, 2}, {1}, {3}]
-        equivalent_mask = get_equivalent_atom_mask(eq_as)
-        print(equivalent_mask)
-        # Output: 
-        # tensor([[1., 0., 1., 0.],
-        #         [0., 1., 0., 0.],
-        #         [1., 0., 1., 0.],
-        #         [0., 0., 0., 1.]])
-
-        """
-        n = sum(len(cols) for cols in eq_as)
-        mask = torch.zeros((n , n ))
-        for columns in eq_as:  
-                if len(columns)>1:
-                        for col1 in columns:
-                                for col2 in columns:
-                                        mask[col1,col2] = 1
-                if len(columns) == 1:
-                                mask[list(columns), list(columns)] = 1
-        return mask
-
-    def symmetrywise_correspondence_matrix(self, M, eq_as):
+    
+    def symmetrywise_correspondence_matrix(self, M, eq_as,rp_mapper):
         """
         Update the predicted correspondence matrix while considering molecule symmetry to avoid penalizing indistinguishable atoms.
 
         Args:
             M: The initial similarity scores matrix.
             eq_as: A list of sets of equivalent atoms for product molecule.
+            rp_mapper: mapper function between atoms in reactant and product molecule atoms
 
         Returns:
             Updated similarity scores matrix with adjustments for molecule symmetry.
-
-        Example:
-        eq_as = [{0, 2}, {1}, {3}]
-        initial_similarity_matrix = torch.tensor([[0.5, 0, 0.5, 0], [0, 1, 0, 0], [0.5, 0, 0.5, 0], [0, 0, 0, 1]])
-        updated_similarity_matrix = symmetrywise_correspondence_matrix(initial_similarity_matrix, eq_as)
-        print(updated_similarity_matrix)
-        # Output:
-        # tensor([[0.75, 0.  , 0.75, 0.  ],
-        #         [0.  , 1.  , 0.  , 0.  ],
-        #         [0.75, 0.  , 0.75, 0.  ],
-        #         [0.  , 0.  , 0.  , 1.  ]], requires_grad=True)
         """
 
-        mask = self.get_equivalent_atom_mask(eq_as)
-        mask= mask.to(device)
         M_by_equivalent=M.clone()
 
-        
-        for eq in eq_as:
-            if len(eq)>1: # in there are some equivalent atoms in the molecul#
-                    eq = list(eq)
-                    for cnt1 in range(len(eq)):
-                        for cnt2 in range(len(eq)):
-                                    if cnt1 != cnt2:
-                                            M_by_equivalent[eq[cnt1],eq[cnt1]] += M_by_equivalent[eq[cnt1],eq[cnt2]]
-                                            M_by_equivalent[eq[cnt1],eq[cnt2]] = 0
+        y_r = list(range(len(M)))
+        for group in eq_as:
+            if len(group) > 1:
+                indices = list(group)
+                for r_ind, p_ind in zip(y_r, rp_mapper):
+                    if p_ind in indices:
+                        for cnt1 in indices:
+                            for cnt2 in indices:
+                                        if cnt1 != cnt2:
+                                                M_by_equivalent[r_ind, p_ind] += M_by_equivalent[r_ind, p_ind]
 
-        M_by_equivalent = M_by_equivalent.to(torch.float32).requires_grad_()
+
+        row_sums = M_by_equivalent.sum(dim=1)
+        normalized_tensor = M_by_equivalent / row_sums.view(-1, 1)
+        M_by_equivalent = normalized_tensor.to(torch.float32).requires_grad_()
         return(M_by_equivalent)
         
         
