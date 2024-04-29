@@ -196,12 +196,13 @@ def get_predicted_atom_mapping(M_0, data):
 def get_acc_on_test(pred,data):
     np_rp = [rp.item() for rp in data.rp_mapper]
     correct = 0
-
-    for i in range(len(pred)):
-        if pred[i] == np_rp[i]:
+    total_elements = len(np_rp)
+    atom_to_set = {atom: atom_set for atom_set in data.eq_as[0] for atom in atom_set}
+    for i in range(total_elements):
+        if pred[i] in atom_to_set[np_rp[i]]:
             correct += 1
-    total_nodes = data.y_r.size(0)
-    return(correct / total_nodes) 
+
+    return(correct / total_elements) 
 
 
 
