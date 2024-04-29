@@ -98,10 +98,9 @@ class FMNet(torch.nn.Module):
                 indices = list(group)
                 for r_ind, p_ind in zip(y_r, rp_mapper):
                     if p_ind in indices:
-                        for cnt1 in indices:
-                            for cnt2 in indices:
-                                        if cnt1 != cnt2:
-                                                M_by_equivalent[r_ind, p_ind] += M_by_equivalent[r_ind, p_ind]
+                        for cnt in indices:
+                            if p_ind != cnt:
+                                    M_by_equivalent[r_ind, p_ind] += M_by_equivalent[r_ind, cnt]
 
 
         row_sums = M_by_equivalent.sum(dim=1)
