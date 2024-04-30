@@ -174,22 +174,36 @@ def molecule_to_graph(mol):
 
 
 def get_predicted_atom_mapping(M_0, data):
-    index_r = range(len(data.y_r))
-    index_r = torch.tensor(index_r, device = device)
-    pred = M_0[index_r].argmax(dim=-1)
-    pred= pred.tolist()
+    '''
+    Adjusts the predicted atom mapping based on equivalent atom sets to account for molecule symmetry.
 
-    replaced_atoms = set() 
+    Args:
+        M_0 (torch.Tensor): Initial similarity scores matrix between nodes.
+        data : Molecule graph.
+
+    Returns:
+        list: Adjusted predicted atom mapping.
+
+    '''
+    index_r = range(len(data.y_r))
+    index_r = torch.tensor(index_r, device=device)
+    pred = M_0[index_r].argmax(dim=-1).tolist()
+
     atom_to_set = {atom: atom_set for atom_set in data.eq_as[0] for atom in atom_set}
-    occurrences = {}
+
+    replaced_atoms = set()
+
     for i, atom in enumerate(pred):
         if atom in atom_to_set:
-            occurrences[atom] = occurrences.get(atom, 0) + 1
-            if occurrences[atom] == 2:
-                atom_set = atom_to_set[atom]
-                if len(atom_set) > 1:
-                    other_atom = next(iter(atom_set - {atom}))
+            atom_set = atom_to_set[atom]
+            if len(atom_set) > 1 and atom not in replaced_atoms:
+                available_atoms = [a for a in atom_set if a not in replaced_atoms and a != atom]
+                if available_atoms:
+                    other_atom = available_atoms[0]
                     pred[i] = other_atom
+                    replaced_atoms.add(atom)
+                    replaced_atoms.add(other_atom)
+
     return pred
 
 
